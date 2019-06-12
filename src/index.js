@@ -98,26 +98,34 @@ async function writeSpreadsheet(){
     'min-row' :1,
     'max-row' :1000,
     'min-col' :1,
-    'max-col' :6,
+    'max-col' :7,
     'return-empty': true
   })
   for(let i=0;i<pricesArray.length;i++){
       console.log(asinsArray[i]+':i:'+i);
-      cells[6+0+i*6].value = asinsArray[i];
-      cells[6+0+i*6].save();
+      cells[7+0+i*7].value = asinsArray[i];
+      cells[7+0+i*7].save();
       console.log(asinsArray[i]);
-      cells[6+1+i*6].value = pricesArray[i];
-      cells[6+1+i*6].save();
+      cells[7+1+i*7].value = pricesArray[i];
+      cells[7+1+i*7].save();
       console.log(pricesArray[i]);
-      cells[6+2+i*6].value = conditionsArray[i];
+      cells[7+2+i*7].value = conditionsArray[i];
       console.log(conditionsArray[i]);
-      cells[6+2+i*6].save();
-      cells[6+3+i*6].value = deliveriesArray[i];
+      cells[7+2+i*7].save();
+      cells[7+3+i*7].value = deliveriesArray[i];
       console.log(deliveriesArray[i]);
-      cells[6+3+i*6].save();
-      cells[6+4+i*6].value = sellersArray[i];
+      cells[7+3+i*7].save();
+      cells[7+4+i*7].value = sellersArray[i];
       console.log(sellersArray[i]);
-      cells[6+4+i*6].save();
+      cells[7+4+i*7].save();
+      let today = new Date();
+      let date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+      let time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+      let dateTime = date+' '+time;
+
+      cells[7+6+i*7].value = dateTime;
+      cells[7+6+i*7].save();
+      console.log(dateTime);
       await delay(300);
   }
 }
