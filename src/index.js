@@ -96,7 +96,7 @@ async function writeSpreadsheet(){
   const sheet1 = info.worksheets[1];
   const cells = await promisify(sheet1.getCells)({
     'min-row' :1,
-    'max-row' :1000,
+    'max-row' :500,
     'min-col' :1,
     'max-col' :7,
     'return-empty': true
@@ -110,14 +110,14 @@ async function writeSpreadsheet(){
       cells[7+1+i*7].save();
       console.log(pricesArray[i]);
       cells[7+2+i*7].value = conditionsArray[i];
-      console.log(conditionsArray[i]);
       cells[7+2+i*7].save();
-      cells[7+3+i*7].value = deliveriesArray[i];
-      console.log(deliveriesArray[i]);
+      console.log(conditionsArray[i]);
+      cells[7+3+i*7].value = deliveriesArray[i];  
       cells[7+3+i*7].save();
+      console.log(deliveriesArray[i]);
       cells[7+4+i*7].value = sellersArray[i];
-      console.log(sellersArray[i]);
       cells[7+4+i*7].save();
+      console.log(sellersArray[i]);
       let today = new Date();
       let date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
       let time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
@@ -126,6 +126,7 @@ async function writeSpreadsheet(){
       cells[7+6+i*7].value = dateTime;
       cells[7+6+i*7].save();
       console.log(dateTime);
+      
       await delay(300);
   }
 }
