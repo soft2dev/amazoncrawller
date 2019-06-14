@@ -1,7 +1,7 @@
 {
-  "name": "crypto-currency-payment-api",
+  "name": "amazon-crawler",
   "version": "1.0.0",
-  "description": "Cryptocurrency Payment API",
+  "description": "This is simple web app to get info from amazon",
   "main": "index.js",
   "author": "soft2dev",
   "license": "MIT",

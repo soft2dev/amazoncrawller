@@ -31,47 +31,77 @@ let conditionsArray  = [];
 let deliveriesArray  = [];
 let sellersArray  = [];
 let asinsArray  = [];
+let inventoryArray  = [];
 let driver = new Builder().forBrowser('chrome').build();
 const creds = require('../client_secret.json');
 (async function example() {
     await readSpreadsheet();
     console.log("Products :" + pricesArray.length);
     await writeSpreadsheet();
+    // await getValueAmazon1(0,'B075GFNJG7')
 })();
-
 async function getValueAmazon(i,asin){
-    console.log("page number: "+i);
-    await driver.get(`https://www.amazon.com/gp/offer-listing/${asin}/ref=olp_page_1?ie=UTF8&f_all=true&f_new=true&&startIndex=${10*i}`);
-   let prices = await driver.findElements(By.css('span.a-size-large.a-color-price '));
-   prices.map(await function (el) {
-        el.getText().then(function(txt){
-          asinsArray.push(asin);
-          pricesArray.push(txt);
-            console.log('price : '+txt);
-        });
-    });
-    let conditions = await driver.findElements(By.css('.a-size-medium.olpCondition '));
-    conditions.map(function (el) {
-        el.getText().then(function(txt){
-          conditionsArray.push(txt);
-          console.log('condition : '+txt);
-        });
-    });
-    let deliveries = await driver.findElements(By.css('.a-column.a-span3.olpDeliveryColumn '));
-    deliveries.map(function (el) {
-        el.getText().then(function(txt){
-          deliveriesArray.push(txt);
-          console.log('Delivery : '+txt);
-        });
-    });
-    let sellers = await driver.findElements(By.css('.a-column.a-span2.olpSellerColumn '));
-    sellers.map(function (el) {
-        el.getText().then(function(txt){
-          sellersArray.push(txt);
-          console.log('Seller : '+txt);
-        });
-    });
+  console.log("page number: "+i);
+  await driver.get(`https://www.amazon.com/gp/offer-listing/${asin}/ref=olp_page_1?ie=UTF8&f_all=true&f_new=true&&startIndex=${10*i}`);
+ let prices = await driver.findElements(By.css('span.a-size-large.a-color-price '));
+ prices.map(await function (el) {
+      el.getText().then(function(txt){
+        asinsArray.push(asin);
+        pricesArray.push(txt);
+          console.log('price : '+txt);
+      });
+  });
+  let conditions = await driver.findElements(By.css('.a-size-medium.olpCondition '));
+  conditions.map(function (el) {
+      el.getText().then(function(txt){
+        conditionsArray.push(txt);
+        console.log('condition : '+txt);
+      });
+  });
+  let deliveries = await driver.findElements(By.css('.a-column.a-span3.olpDeliveryColumn '));
+  deliveries.map(function (el) {
+      el.getText().then(function(txt){
+        deliveriesArray.push(txt);
+        console.log('Delivery : '+txt);
+      });
+  });
+  let sellers = await driver.findElements(By.css('.a-column.a-span2.olpSellerColumn '));
+  sellers.map(function (el) {
+      el.getText().then(function(txt){
+        sellersArray.push(txt);
+        console.log('Seller : '+txt);
+      });
+  });
+  console.log('inventories------------')
+  let inventories = await driver.findElements(By.css('.a-button-input'));
+  console.log('inventories------------')
+  //inventories.map(await async function (el) {
+    for(let j=0;j<inventories.length;j++){
+      await getInventoryAmazon(j,asin,i);
+      await delay(3000);
+    }
+  //});
 }
+async function getInventoryAmazon(iventoryNumber,asin,i){
+  await driver.get(`https://www.amazon.com/gp/offer-listing/${asin}/ref=olp_page_1?ie=UTF8&f_all=true&f_new=true&&startIndex=${10*i}`);
+  let inventories = await driver.findElements(By.css('.a-button-input'));
+  let el = inventories[iventoryNumber];
+  await el.click().then(function(){});
+  await delay(500);
+  await driver.findElement(By.id('hlb-view-cart-announce')).click();
+  console.log('cart1------------------------------------');
+  await driver.findElement(By.css('.a-button.a-button-dropdown.a-button-small.a-button-span8.quantity')).click();
+  console.log('cart2-------------------------------------')
+  await delay(500);
+  await driver.findElement(By.linkText("10+")).click();
+  await driver.findElement(By.css(".a-input-text.a-span8.sc-quantity-textfield.sc-hidden")).sendKeys('999', Key.RETURN);
+  await delay(2000);
+  let inventory = await driver.findElement(By.css(".a-row.a-spacing-base.sc-action-quantity.sc-action-quantity-right")).getAttribute('data-old-value');
+  inventoryArray.push(inventory);
+  console.log('inventory',inventory)
+  // await driver.get('chrome://settings/clearBrowserData');
+}
+
 async function readSpreadsheet(){
     const doc = new GoogleSpreadsheet(sheet_number);
     await promisify(doc.useServiceAccountAuth)(creds);
@@ -117,6 +147,9 @@ async function writeSpreadsheet(){
       console.log(deliveriesArray[i]);
       cells[7+4+i*7].value = sellersArray[i];
       cells[7+4+i*7].save();
+      console.log(sellersArray[i]);
+      cells[7+5+i*7].value = inventoryArray[i];
+      cells[7+5+i*7].save();
       console.log(sellersArray[i]);
       let today = new Date();
       let date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
