@@ -153,7 +153,7 @@ async function writeSpreadsheet(){
   const sheet1 = info.worksheets[1];
   const cells = await promisify(sheet1.getCells)({
     'min-row' :1,
-    'max-row' :999,
+    'max-row' :500,
     'min-col' :1,
     'max-col' :8,
     'return-empty': true
