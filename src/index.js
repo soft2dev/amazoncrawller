@@ -107,6 +107,7 @@ async function getInventoryAmazon(iventoryNumber,asin,i){
   console.log('cart2-------------------------------------')
   await delay(1000);
   await driver.findElement(await By.linkText("10+")).click();
+  await delay(1000);
   await driver.findElement(await By.css(".a-input-text.a-span8.sc-quantity-textfield.sc-hidden")).sendKeys('999', Key.RETURN);
   await delay(2000);
   let inventory = await driver.findElement(await By.css(".a-row.a-spacing-base.sc-action-quantity.sc-action-quantity-right")).getAttribute('data-old-value');
