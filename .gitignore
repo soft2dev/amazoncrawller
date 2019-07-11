@@ -1,6 +1,4 @@
-/node_modules
-
-/.env
-
-
-/client_secret.json
+node_modules
+.env
+client_secret.json
+.DS_store
