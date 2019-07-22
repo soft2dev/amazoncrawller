@@ -40,16 +40,13 @@ let driver = new Builder().forBrowser('chrome').build();
 const creds = require('../client_secret.json');
 (async function example() {
   await readSpreadsheet();
-  console.log('Products :' + pricesArray.length);
   await writeSpreadsheet();
-  // await getValueAmazon1(0,'B075GFNJG7')
 })();
 async function getValueAmazon(i, asin) {
   console.log('page number: ' + i);
   await driver.get(`https://www.amazon.com/gp/offer-listing/${asin}/ref=olp_page_1?ie=UTF8&f_all=true&f_new=true&&startIndex=${10 * i}`);
   let firstSeller = await driver.findElement(By.css('.a-column.a-span2.olpSellerColumn '));
-  if (await firstSeller.getText() == markSellerName) {
-    console.log('return 0');
+  if (await firstSeller.getText() === markSellerName) {
     return;
   } else {
     markSellerName = await firstSeller.getText();
@@ -85,9 +82,8 @@ async function getValueAmazon(i, asin) {
       console.log('Seller : ' + txt); 
     });
   });
-  console.log('inventories------------');
+  console.log('inventories');
   let inventories = await driver.findElements(By.css('.a-button-input'));
-  console.log('inventories------------');
   // inventories.map(await async function (el) {
   for (let j = 0; j < inventories.length; j++) {
     await getInventoryAmazon(j, asin, i);
@@ -101,9 +97,7 @@ async function getInventoryAmazon(iventoryNumber, asin, i) {
   await el.click().then(function() {});
 
   await driver.findElement(await By.id('hlb-view-cart-announce')).click();
-  console.log('cart1------------------------------------');
   await driver.findElement(await By.css('.a-button.a-button-dropdown.a-button-small.a-button-span8.quantity')).click();
-  console.log('cart2-------------------------------------');
   driver.wait(until.elementLocated(By.linkText('10+')), 30000)
     .then(function() {
       // driver.navigate().back();
@@ -142,7 +136,6 @@ async function getInventoryAmazon(iventoryNumber, asin, i) {
       if (alertStr.includes('limit')) {
         limitInventoryArray[limitInventoryArray.length - 1] = inventory;
         inventoryArray[inventoryArray.length - 1] = 0;
-        console.log('-------------------------------------------------------------');
         console.log('inventory', inventoryArray[inventoryArray.length - 1]);
         console.log('limitinventory', inventory);
       } 
@@ -150,18 +143,6 @@ async function getInventoryAmazon(iventoryNumber, asin, i) {
       console.log('Error happened!');
       console.log(error);
     });
-  // let alert = await driver.findElement(await By.css('.sc-quantity-update-message.a-spacing-top-mini'));
-  // let alertStr = await alert.getText();
-  // console.log('alert', alertStr);
-  // if (alertStr.includes('limit')) {
-  //   limitInventoryArray[limitInventoryArray.length - 1] = inventory;
-  //   inventoryArray[inventoryArray.length - 1] = 0;
-  //   console.log('-------------------------------------------------------------');
-  //   console.log('inventory', inventoryArray[inventoryArray.length - 1]);
-  //   console.log('limitinventory', inventory);
-  // } 
-  
-  // await driver.get('chrome://settings/clearBrowserData');
 }
 
 async function readSpreadsheet() {
