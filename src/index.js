@@ -35,7 +35,7 @@ let sellersArray = [];
 let asinsArray = [];
 let inventoryArray = [];
 let limitInventoryArray = [];
-let markSellerName = ' ';
+let markSellerName = null;
 let driver = new Builder().forBrowser('chrome').build();
 const creds = require('../client_secret.json');
 (async function example() {
@@ -45,7 +45,9 @@ const creds = require('../client_secret.json');
 async function getValueAmazon(i, asin) {
   console.log('page number: ' + i);
   await driver.get(`https://www.amazon.com/gp/offer-listing/${asin}/ref=olp_page_1?ie=UTF8&f_all=true&f_new=true&&startIndex=${10 * i}`);
+  
   let firstSeller = await driver.findElement(By.css('.a-column.a-span2.olpSellerColumn '));
+  console.log('firstSellor', firstSeller.getText(), markSellerName);
   if (await firstSeller.getText() === markSellerName) {
     return;
   } else {
@@ -95,10 +97,23 @@ async function getInventoryAmazon(iventoryNumber, asin, i) {
   let inventories = await driver.findElements(await By.css('.a-button-input'));
   let el = inventories[iventoryNumber];
   await el.click().then(function() {});
-
-  await driver.findElement(await By.id('hlb-view-cart-announce')).click();
-  await driver.findElement(await By.css('.a-button.a-button-dropdown.a-button-small.a-button-span8.quantity')).click();
-  driver.wait(until.elementLocated(By.linkText('10+')), 30000)
+  await driver.wait(until.elementLocated(By.id('hlb-view-cart-announce')), 30000)
+    .then(function() {
+      // driver.navigate().back();
+      driver.findElement(By.id('hlb-view-cart-announce')).click();
+    }, function (error) {
+      console.log('Error happened!');
+      console.log(error);
+    });
+  await driver.wait(until.elementLocated(By.css('.a-button.a-button-dropdown.a-button-small.a-button-span8.quantity')), 30000)
+    .then(function() {
+      // driver.navigate().back();
+      driver.findElement(By.css('.a-button.a-button-dropdown.a-button-small.a-button-span8.quantity')).click();
+    }, function (error) {
+      console.log('Error happened!');
+      console.log(error);
+    });
+  await driver.wait(until.elementLocated(By.linkText('10+')), 30000)
     .then(function() {
       // driver.navigate().back();
       driver.findElement(By.linkText('10+')).click();
@@ -107,38 +122,41 @@ async function getInventoryAmazon(iventoryNumber, asin, i) {
       console.log(error);
     });
   // await driver.findElement(await By.linkText('10+')).click();
-  driver.wait(until.elementLocated(By.css('.a-input-text.a-span8.sc-quantity-textfield.sc-hidden')), 30000)
-    .then(function() {
+  await driver.wait(until.elementLocated(By.css('.a-input-text.a-span8.sc-quantity-textfield.sc-hidden')), 30000)
+    .then(async function() {
       // driver.navigate().back();
-      driver.findElement(By.css('.a-input-text.a-span8.sc-quantity-textfield.sc-hidden')).sendKeys('999', Key.RETURN);
+      await driver.findElement(By.css('.a-input-text.a-span8.sc-quantity-textfield.sc-hidden')).sendKeys('999', Key.RETURN);
     }, function (error) {
       console.log('Error happened!');
       console.log(error);
     });
   // await driver.findElement(await By.css('.a-input-text.a-span8.sc-quantity-textfield.sc-hidden')).sendKeys('999', Key.RETURN);
-  driver.wait(until.elementLocated(By.css('.a-row.a-spacing-base.sc-action-quantity.sc-action-quantity-right')), 30000)
-    .then(function() {
+  let inventory = null;
+  await delay(2500);
+  await driver.wait(until.elementLocated(By.css('.a-row.a-spacing-base.sc-action-quantity.sc-action-quantity-right')), 30000)
+    .then(async function() {
       // driver.navigate().back();
+      inventory = await driver.findElement(By.css('.a-row.a-spacing-base.sc-action-quantity.sc-action-quantity-right')).getAttribute('data-old-value');
+      inventoryArray.push(inventory);
+      limitInventoryArray.push(0);
+      console.log('inventory', inventory);
     }, function (error) {
       console.log('Error happened!');
       console.log(error);
     });
-  let inventory = await driver.findElement(await By.css('.a-row.a-spacing-base.sc-action-quantity.sc-action-quantity-right')).getAttribute('data-old-value');
-  inventoryArray.push(inventory);
-  limitInventoryArray.push(0);
-  console.log('inventory', inventory);
-  driver.wait(until.elementLocated(By.css('.sc-quantity-update-message.a-spacing-top-mini')), 30000)
-    .then(function() {
+
+  await driver.wait(until.elementLocated(By.css('.sc-quantity-update-message.a-spacing-top-mini')), 30000)
+    .then(async function() {
       // driver.navigate().back();
-      let alert = driver.findElement(By.css('.sc-quantity-update-message.a-spacing-top-mini'));
-      let alertStr = alert.getText();
+      let alert = await driver.findElement(By.css('.sc-quantity-update-message.a-spacing-top-mini'));
+      let alertStr = await alert.getText();
       console.log('alert', alertStr);
       if (alertStr.includes('limit')) {
         limitInventoryArray[limitInventoryArray.length - 1] = inventory;
         inventoryArray[inventoryArray.length - 1] = 0;
         console.log('inventory', inventoryArray[inventoryArray.length - 1]);
         console.log('limitinventory', inventory);
-      } 
+      }
     }, function (error) {
       console.log('Error happened!');
       console.log(error);
